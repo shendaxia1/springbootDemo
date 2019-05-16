@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.miss.mapper.AuthorityMapper">
+    <resultMap id="BaseResultMap" type="com.example.miss.model.Authority">
+        <result column="id" property="id" jdbcType="BIGINT"/>
+        <result column="data_url" property="dataUrl" jdbcType="VARCHAR"/>
+        <result column="menu_class" property="menuClass" jdbcType="VARCHAR"/>
+        <result column="menu_code" property="menuCode" jdbcType="VARCHAR"/>
+        <result column="menu_name" property="menuName" jdbcType="VARCHAR"/>
+        <result column="parent_menucode" property="parentMenucode" jdbcType="VARCHAR"/>
+        <result column="sequence" property="sequence" jdbcType="BIGINT"/>
+        <result column="menu_type" property="menuType" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="menu_state" property="menuState" jdbcType="TINYINT"/>
+    </resultMap>
+    <sql id="AuthorityColumns">
+        id,
+        data_url,
+        menu_class,
+        menu_code,
+        menu_name,
+        parent_menucode,
+        sequence,
+        menu_type,
+        create_time,
+        menu_state
+    </sql>
+    <insert id="insert" parameterType="com.example.miss.model.Authority">
+        insert into sys_authority (id, data_url, menu_class,
+        menu_code, menu_name, parent_menucode,
+        sequence, menu_type, create_time,
+        menu_state)
+        values (#{id,jdbcType=BIGINT}, #{dataUrl,jdbcType=VARCHAR}, #{menuClass,jdbcType=VARCHAR},
+        #{menuCode,jdbcType=VARCHAR}, #{menuName,jdbcType=VARCHAR}, #{parentMenucode,jdbcType=VARCHAR},
+        #{sequence,jdbcType=BIGINT}, #{menuType,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR},
+        #{menuState,jdbcType=TINYINT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.example.miss.model.Authority">
+        insert into sys_authority
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="dataUrl != null">
+                data_url,
+            </if>
+            <if test="menuClass != null">
+                menu_class,
+            </if>
+            <if test="menuCode != null">
+                menu_code,
+            </if>
+            <if test="menuName != null">
+                menu_name,
+            </if>
+            <if test="parentMenucode != null">
+                parent_menucode,
+            </if>
+            <if test="sequence != null">
+                sequence,
+            </if>
+            <if test="menuType != null">
+                menu_type,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="menuState != null">
+                menu_state,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="dataUrl != null">
+                #{dataUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="menuClass != null">
+                #{menuClass,jdbcType=VARCHAR},
+            </if>
+            <if test="menuCode != null">
+                #{menuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="menuName != null">
+                #{menuName,jdbcType=VARCHAR},
+            </if>
+            <if test="parentMenucode != null">
+                #{parentMenucode,jdbcType=VARCHAR},
+            </if>
+            <if test="sequence != null">
+                #{sequence,jdbcType=BIGINT},
+            </if>
+            <if test="menuType != null">
+                #{menuType,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=VARCHAR},
+            </if>
+            <if test="menuState != null">
+                #{menuState,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <!--通过角色id查询出该角色所有的权限-->
+    <select id="findRolePremission" resultType="com.example.miss.model.Authority">
+        select
+        *
+        from sys_authority where menu_code in (select menu_code from sys_role_authority where role_key=#{role_key})
+    </select>
+    <!--根据menu_code查询出一条权限信息-->
+    <select id="findPremission" resultType="com.example.miss.model.Authority">
+        select * from sys_authority where menu_code = #{menuCode}
+    </select>
+    <!--  查询出分页的每页数据-->
+    <select id="permissionPageList" resultType="com.example.miss.model.Authority">
+        select
+        <include refid="AuthorityColumns"/>
+        from sys_authority
+        <where>
+            <if test="dataUrl != null">
+                data_url = #{dataUrl}
+            </if>
+            AND
+            menu_state = 1
+        </where>
+        limit #{index},#{limit}
+    </select>
+    <!--查询出总数据，也是做分页用-->
+    <select id="permissionCount" resultType="java.lang.Integer">
+        select count(*) from sys_authority
+        <where>
+            <if test="dataUrl != null">
+                data_url = #{dataUrl}
+            </if>
+            AND
+            menu_state = 1
+        </where>
+    </select>
+    <!--添加权限信息-->
+    <insert id="permissionAdd" parameterType="com.example.miss.model.Authority">
+        insert into sys_authority(data_url,menu_code,menu_name,create_time,menu_state)VALUES
+        (#{dataUrl},#{menuCode},#{menuName},#{createTime},1)
+    </insert>
+    <!--删除权限信息-->
+    <update id="deleteP" parameterType="java.lang.String">
+        update sys_authority set menu_state = 0 where menu_code = #{menuCode}
+    </update>
+    <!--修改权限信息-->
+    <update id="alterP" parameterType="java.lang.String">
+        update sys_authority set create_time = #{createTime},data_url = #{dataUrl},menu_name=#{menuName} where
+        menu_code=#{menuCode}
+    </update>
+
+    <!--查询出所有的权限信息-->
+    <select id="findAllPermission" resultType="com.example.miss.model.Authority">
+        select * from sys_authority
+    </select>
+</mapper>

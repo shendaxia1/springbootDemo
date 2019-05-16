@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.miss.mapper.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.example.miss.model.Role">
+        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="role_key" property="roleKey" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="role_value" property="roleValue" jdbcType="VARCHAR"/>
+        <result column="company_id" property="companyId" jdbcType="BIGINT"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.example.miss.model.Role">
+        insert into sys_role (role_id, role_key, create_time,
+        description, role_value, company_id
+        )
+        values (#{roleId,jdbcType=INTEGER}, #{roleKey,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR}, #{roleValue,jdbcType=VARCHAR}, #{companyId,jdbcType=BIGINT}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.example.miss.model.Role">
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleId != null">
+                role_id,
+            </if>
+            <if test="roleKey != null">
+                role_key,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="roleValue != null">
+                role_value,
+            </if>
+            <if test="companyId != null">
+                company_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleId != null">
+                #{roleId,jdbcType=INTEGER},
+            </if>
+            <if test="roleKey != null">
+                #{roleKey,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="roleValue != null">
+                #{roleValue,jdbcType=VARCHAR},
+            </if>
+            <if test="companyId != null">
+                #{companyId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <!--通过用户id查询到用户所有的角色-->
+    <select id="findUserRole" resultType="com.example.miss.model.Role">
+        select * from sys_role where role_id in (select role_key from sys_user_role where user_id=#{userid})
+    </select>
+    <!-- 根据角色role_value查询出一条角色信息-->
+    <select id="findRole" resultType="com.example.miss.model.Role">
+        select * from sys_role where role_value=#{token}
+    </select>
+
+    <!--  查询出分页的每页数据-->
+    <select id="rolePageList" resultType="com.example.miss.model.Role">
+        select * from sys_role
+        <where>
+            <if test="roleValue != null">
+                role_value = #{roleValue}
+            </if>
+        </where>
+        limit #{index},#{limit}
+    </select>
+    <!--查询出总数据，也是做分页用-->
+    <select id="roleCount" resultType="java.lang.Integer">
+        select count(*) from sys_role
+        <where>
+            <if test="roleValue != null">
+                role_value = #{roleValue}
+            </if>
+        </where>
+    </select>
+    <!--修改角色信息-->
+    <update id="updateRole" parameterType="com.example.miss.model.Role">
+        update sys_role set description = #{description},role_value=#{roleValue},create_time = #{createTime} where
+        role_key=#{roleKey}
+    </update>
+    <!-- 删除角色信息-->
+    <delete id="deleteRole" parameterType="java.lang.String">
+        delete from sys_role where role_key = #{roleKey}
+    </delete>
+    <!--查询出所有的角色-->
+    <select id="findAllRole" resultType="com.example.miss.model.Role">
+        select * from sys_role
+    </select>
+</mapper>

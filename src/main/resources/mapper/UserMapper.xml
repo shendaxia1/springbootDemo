@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.miss.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.example.miss.model.User">
+        <result column="userid" property="userid" jdbcType="INTEGER"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="department_key" property="departmentKey" jdbcType="VARCHAR"/>
+        <result column="salt" property="salt" jdbcType="VARCHAR"/>
+        <result column="flat" property="flat" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="avater" property="avater" jdbcType="VARCHAR"/>
+        <result column="introduce" property="introduce" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.example.miss.model.User">
+        insert into sys_user (userid, username, password,
+        department_key, salt, flat,name,avater,introduce,create_time
+        )
+        values (#{userid,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+        #{departmentKey,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{flat,jdbcType=INTEGER},#{name,jdbcType=VARCHAR},
+        #{avater,jdbcType=VARCHAR},#{introduce,jdbcType=VARCHAR},#{createTime,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.example.miss.model.User">
+        insert into sys_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userid != null">
+                userid,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="departmentKey != null">
+                department_key,
+            </if>
+            <if test="salt != null">
+                salt,
+            </if>
+            <if test="flat != null">
+                flat,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="departmentKey != null">
+                #{departmentKey,jdbcType=VARCHAR},
+            </if>
+            <if test="salt != null">
+                #{salt,jdbcType=VARCHAR},
+            </if>
+            <if test="flat != null">
+                #{flat,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <!--用户登陆按用户名查询出用户信息，交给shiro处理-->
+    <select id="findUser" resultType="com.example.miss.model.User">
+        select * from sys_user where username=#{username}
+    </select>
+
+    <!--查询出分页后每一页的数据-->
+    <select id="findPageUser" resultType="com.example.miss.model.User">
+        select * from sys_user
+        <where>
+            <if test="name != null">
+                name = #{name}
+            </if>
+            AND
+            flat = 1
+        </where>
+        limit #{index},#{limit}
+    </select>
+
+    <!--查询出符合条件的数据总量-->
+    <select id="findUserConunt" resultType="java.lang.Integer">
+        SELECT COUNT(*) from sys_user
+        <where>
+            <if test="name != null">
+                name = #{name}
+            </if>
+            AND
+            flat = 1
+        </where>
+    </select>
+    <!--按用户id查询出一条用户信息-->
+    <select id="findUserById" resultType="com.example.miss.model.User">
+        select * from sys_user where userid = #{userid}
+    </select>
+    <!--更新用户-->
+    <update id="updateUser" parameterType="com.example.miss.model.User">
+        update sys_user set username=#{username},name=#{name},create_time=#{createTime} where userid=#{userid}
+    </update>
+    <!--  按id删除用户信息-->
+    <update id="deleteUser" parameterType="java.lang.Integer">
+        update sys_user set flat = 0 where userid=#{userid}
+    </update>
+
+    <!--按条件查询员工-->
+    <select id="selectUser" resultType="com.example.miss.model.User">
+        select * from sys_user where name=#{name}
+    </select>
+    <!--上面查询结果返回的一个总数-->
+    <select id="selectUserCount" resultType="java.lang.Integer">
+        select count(*) from sys_user where name=#{name}
+    </select>
+
+</mapper>
